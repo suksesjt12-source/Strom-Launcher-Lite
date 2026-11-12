@@ -1,0 +1,59 @@
+package com.narutolauncher.lite
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.ProgressBar
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import java.io.File
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val btnPlay = findViewById<Button>(R.id.btnPlay)
+        val btnDownload = findViewById<Button>(R.id.btnDownload)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBar)
+        val statusText = findViewById<TextView>(R.id.statusText)
+
+        val baseDir = File(getExternalFilesDir(null), "StromGame")
+        val isReady = File(baseDir, "setup_done.txt").exists()
+
+        if (isReady) {
+            statusText.text = "✅ Emulator siap! Taruh file game di folder StromGame/"
+            btnPlay.isEnabled = true
+            btnDownload.isEnabled = false
+        } else {
+            statusText.text = "⚠️ Klik download untuk menyiapkan emulator (~500MB)"
+            btnPlay.isEnabled = false
+            btnDownload.isEnabled = true
+        }
+
+        btnDownload.setOnClickListener {
+            btnDownload.isEnabled = false
+            statusText.text = "📥 Mengunduh komponen emulator..."
+            progressBar.isIndeterminate = true
+            
+            Thread {
+                // Simulasi download (Ganti dengan URL download Winlator/Box64 asli Anda nanti)
+                Thread.sleep(3000) 
+                File(baseDir, "setup_done.txt").createNewFile()
+                
+                runOnUiThread {
+                    progressBar.isIndeterminate = false
+                    statusText.text = "✅ Setup selesai! Siap dimainkan."
+                    btnPlay.isEnabled = true
+                    Toast.makeText(this, "Setup Berhasil!", Toast.LENGTH_SHORT).show()
+                }
+            }.start()
+        }
+
+        btnPlay.setOnClickListener {
+            Toast.makeText(this, "🚀 Meluncurkan game via emulator...", Toast.LENGTH_LONG).show()
+            // Di sini nanti logika EmulatorEngine.launchGame() dipanggil
+            moveTaskToBack(true)
+        }
+    }
+}
